@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#002A00">
+  <title>crumbz: where are we eating today?</title>
+  <meta name="description" content="A little food diary that turns a pile of saved Google Maps spots into today's plan.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..700,100,1&family=Zen+Maru+Gothic:wght@400;500;700&family=Londrina+Solid:wght@400;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="logo" data-go="home" aria-label="crumbz home">crumbz<img class="logo__star" src="assets/starfish.png" alt="" width="40" height="38"></button>
+    <button class="pill pill--coral pill--icon" data-go="passport">
+      <svg class="pill__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10.5" r="3.2"/><path d="M8.5 17h7"/></svg>
+      my passport
+    </button>
+  </header>
+
+  <main>
+    <!-- ───────── landing ───────── -->
+    <section class="view view--home is-active" id="view-home" aria-labelledby="homeTitle">
+      <div class="hero">
+        <div class="hero__copy">
+          <h1 id="homeTitle" class="hero__title">where are we eating today?</h1>
+          <p class="hero__lede" id="heroLede">a whole lot of saved food spots, across more cities than we can count, and plenty you still haven't tried. let's plan a day around them.</p>
+          <div class="hero__actions">
+            <button class="btn btn--primary" data-go="quiz">plan today's food</button>
+            <button class="btn btn--soft" id="surpriseBtn" aria-expanded="false" aria-controls="surpriseChoices">plan my day for me 🎲</button>
+          </div>
+          <div class="surprise" id="surpriseChoices" hidden>
+            <p class="surprise__q">how do you want to roam?</p>
+            <button class="surprise__opt" data-surprise="city"><span aria-hidden="true">🏙️</span> keep it in one city<small>every stop in the same place</small></button>
+            <button class="surprise__opt" data-surprise="around"><span aria-hidden="true">🚗</span> hop around nearby<small>a few cities close to home</small></button>
+          </div>
+        </div>
+
+        <div class="hero__stamp" aria-hidden="true">
+          <svg viewBox="0 0 300 300" class="stamp-ring">
+            <defs><path id="ringPath" d="M150,150 m-112,0 a112,112 0 1,1 224,0 a112,112 0 1,1 -224,0"/></defs>
+            <circle cx="150" cy="150" r="138" class="ring-outer"/>
+            <circle cx="150" cy="150" r="88" class="ring-inner"/>
+            <text class="ring-text" textLength="703" lengthAdjust="spacing"><textPath href="#ringPath">saved &amp; savored ~ go somewhere new ~ saved &amp; savored ~ go somewhere new ~&#160;</textPath></text>
+          </svg>
+          <div class="stamp-center">
+            <span class="stamp-word">good<br>food<br>good<br>mood</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="special" aria-labelledby="specialTitle">
+        <div class="special__tab" id="specialTitle">today's special</div>
+        <div class="special__body" id="specialBody"></div>
+      </aside>
+
+      <div class="cities" aria-label="where your saves are">
+        <h2 class="cities__title"><span>where your saves live</span></h2>
+        <div class="cities__list" id="cityStrip"></div>
+      </div>
+    </section>
+
+    <!-- ───────── quiz ───────── -->
+    <section class="view view--quiz" id="view-quiz" aria-live="polite">
+      <div class="quiz">
+        <div class="quiz__top">
+          <button class="link-btn" id="quizBack">← back</button>
+          <ol class="dots" id="quizDots" aria-label="progress"></ol>
+        </div>
+        <div class="quiz__card" id="quizCard"></div>
+      </div>
+    </section>
+
+    <!-- ───────── results ───────── -->
+    <section class="view view--results" id="view-results">
+      <div class="results__head">
+        <div>
+          <h1 class="results__title" id="resultsTitle">your day</h1>
+          <p class="results__summary" id="resultsSummary"></p>
+        </div>
+        <div class="results__actions">
+          <button class="btn btn--soft" id="reshuffle" hidden>shuffle again 🎲</button>
+          <button class="btn btn--ghost" data-go="quiz">start over</button>
+        </div>
+      </div>
+
+      <aside class="day" aria-labelledby="dayTitle">
+        <div class="day__head">
+          <h2 class="day__title" id="dayTitle">my day so far</h2>
+          <button class="btn btn--primary btn--sm" id="saveDay">save this day</button>
+        </div>
+        <ol class="day__stops" id="dayStops"></ol>
+      </aside>
+
+      <div class="slots" id="slots"></div>
+    </section>
+
+    <!-- ───────── passport ───────── -->
+    <section class="view view--passport" id="view-passport">
+      <div class="passport__head">
+        <h1 class="passport__title">my food passport</h1>
+        <p class="passport__sub" id="passportSub"></p>
+      </div>
+      <div class="tabs" role="tablist">
+        <button role="tab" class="tab is-active" aria-selected="true" data-tab="stamps">stamps</button>
+        <button role="tab" class="tab" aria-selected="false" data-tab="days">my days</button>
+        <button role="tab" class="tab" aria-selected="false" data-tab="saved">saved for later</button>
+      </div>
+      <div class="log-search">
+        <label for="logSearch">went somewhere already? find it and stamp it</label>
+        <input id="logSearch" type="search" placeholder="search your saved spots…" autocomplete="off">
+        <ul class="match-list match-list--search" id="logResults"></ul>
+      </div>
+      <div class="stamps sheet-coral" id="stampGrid"></div>
+      <div class="days" id="daysGrid" hidden></div>
+      <div class="deck deck--saved" id="savedGrid" hidden></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>crumbz, made from a very long list of saved spots</span>
+    <button class="link-btn" id="buddyToggle" aria-pressed="true">hide pinchy &amp; the starfish</button>
+  </footer>
+
+  <!-- visit dialog -->
+  <dialog class="sheet" id="visitDialog" aria-labelledby="visitTitle">
+    <form method="dialog" class="sheet__form" id="visitForm">
+      <h2 id="visitTitle" class="sheet__title"></h2>
+      <p class="sheet__place" id="visitPlace"></p>
+      <fieldset class="faces">
+        <legend>how was it?</legend>
+        <label><input type="radio" name="rating" value="3" checked><span>🤙<small>going back</small></span></label>
+        <label><input type="radio" name="rating" value="2"><span>🙂<small>it was fine</small></span></label>
+        <label><input type="radio" name="rating" value="1"><span>🫠<small>not for me</small></span></label>
+      </fieldset>
+      <label class="field">what did you get?
+        <input name="order" type="text" placeholder="the yuzu latte + a melon pan">
+      </label>
+      <label class="field">a note to future you
+        <textarea name="note" rows="3" placeholder="get there before 11, the croissants sell out…"></textarea>
+      </label>
+      <label class="field field--date">when?
+        <input name="date" type="date">
+      </label>
+      <div class="sheet__actions">
+        <button class="btn btn--ghost" value="cancel" formnovalidate>cancel</button>
+        <button class="btn btn--danger" value="remove" id="visitRemove" hidden>remove stamp</button>
+        <button class="btn btn--primary" value="save">stamp it</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="thunk" id="thunk" aria-hidden="true"><div class="thunk__stamp"><span id="thunkCity"></span><b>ate here!</b><span id="thunkDate"></span></div></div>
+  <div class="tide" id="tide" aria-hidden="true">
+    <div class="tide__layer tide__layer--1"></div>
+    <div class="tide__layer tide__layer--2"></div>
+    <div class="tide__layer tide__layer--3"></div>
+    <div class="tide__layer tide__layer--4"></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/spots.js"></script>
+  <script src="buddies.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
